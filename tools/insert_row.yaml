@@ -1,0 +1,33 @@
+identity:
+  name: insert_row
+  author: shuzhiyinhang
+  label:
+    en_US: Insert Row
+    zh_Hans: 插入一行数据
+  description:
+    en_US: Insert a single row into a table, supporting all column types including floatvector.
+    zh_Hans: 向指定表插入一行数据，支持所有字段类型（包含 floatvector）。
+  icon: icon.svg
+
+type: action
+parameters:
+  - name: table
+    type: string
+    required: true
+  - name: schema
+    type: string
+    required: false
+  - name: row
+    type: object
+    required: true
+  - name: vector_columns
+    type: string
+    required: false
+  - name: db_uri
+    type: string
+    required: false
+    form: form
+
+extra:
+  python:
+    source: tools/insert_row.py

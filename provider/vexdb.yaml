@@ -1,0 +1,30 @@
+identity:
+  name: vexdb
+  label:
+    en_US: "VexDB"
+    zh_Hans: "VexDB"
+  description:
+    en_US: "Vector database integration tools."
+    zh_Hans: "向量数据库集成工具。"
+  icon: icon.svg
+
+tools:
+  - name: list_databases
+    type: action
+    provider: tools/list_databases.py
+
+  - name: list_tables
+    type: action
+    provider: tools/list_tables.py
+
+  - name: table_schema
+    type: action
+    provider: tools/table_schema.py
+
+  - name: insert_row
+    type: action
+    provider: tools/insert_row.py
+
+  - name: vector_search
+    type: action
+    provider: tools/vector_search.py

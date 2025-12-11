@@ -1,0 +1,45 @@
+identity:
+  name: vector_search
+  author: shuzhiyinhang
+  label:
+    en_US: Vector Search
+    zh_Hans: 向量检索
+  description:
+    en_US: Perform similarity search on a floatvector column with configurable distance and topK.
+    zh_Hans: 在 floatvector 字段上执行相似度检索，可配置距离类型和返回数量。
+  icon: icon.svg
+
+type: action
+parameters:
+  - name: table
+    type: string
+    required: true
+  - name: vector_column
+    type: string
+    required: true
+  - name: query_vector
+    type: array
+    required: true
+  - name: distance_type
+    type: string
+    required: false
+  - name: top_k
+    type: number
+    required: false
+  - name: output_columns
+    type: string
+    required: false
+  - name: filter
+    type: string
+    required: false
+  - name: schema
+    type: string
+    required: false
+  - name: db_uri
+    type: string
+    required: false
+    form: form
+
+extra:
+  python:
+    source: tools/vector_search.py

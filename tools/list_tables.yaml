@@ -1,0 +1,46 @@
+identity:
+  name: list_tables
+  author: shuzhiyinhang
+  label:
+    en_US: List Tables
+    zh_Hans: 列出数据库下的所有表
+
+  description:
+    en_US: List all tables in the target schema, with an option to only return tables containing vector fields.
+    zh_Hans: 列出指定 schema 下的所有表，可选择只返回包含向量字段的表。
+
+  icon: icon.svg
+
+type: action
+parameters:
+  - name: schema
+    type: string
+    required: false
+    label:
+      en_US: Schema
+      zh_Hans: Schema 名称
+    human_description:
+      en_US: Optional. Defaults to 'public'.
+      zh_Hans: 可选。不填默认为 public。
+
+  - name: only_vector_tables
+    type: boolean
+    required: false
+    label:
+      en_US: Only tables with vector columns
+      zh_Hans: 仅包含向量字段的表
+
+  - name: db_uri
+    type: string
+    required: false
+    form: form
+    label:
+      en_US: VexDB URI
+      zh_Hans: VexDB URI
+    human_description:
+      en_US: Optional. Uses provider credentials if omitted.
+      zh_Hans: 可选。不填时使用 provider 配置。
+
+extra:
+  python:
+    source: tools/list_tables.py

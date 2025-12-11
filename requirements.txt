@@ -5,4 +5,4 @@ pymssql~=2.3.2
 oracledb~=2.2.1
 psycopg2-binary~=2.9.10
 cryptography~=44.0.2
-pandas~=2.2.3
+pandas~=2.2.3records

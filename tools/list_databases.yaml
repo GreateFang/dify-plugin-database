@@ -1,0 +1,27 @@
+identity:
+  name: list_databases
+  author: shuzhiyinhang
+  label:
+    en_US: List Databases
+    zh_Hans: 列出所有数据库
+  icon: icon.svg
+  description:
+    en_US: List all non-template databases in the VexDB instance.
+    zh_Hans: 列出当前 VexDB 实例中的所有非模板数据库。
+
+type: action
+parameters:
+  - name: db_uri
+    type: string
+    required: false
+    form: form
+    label:
+      en_US: VexDB URI
+      zh_Hans: VexDB URI
+    human_description:
+      en_US: Optional. If empty, uses provider configuration.
+      zh_Hans: 可选。不填时使用 provider 的配置。
+
+extra:
+  python:
+    source: tools/list_databases.py
