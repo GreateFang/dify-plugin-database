@@ -2,7 +2,6 @@ from typing import Any
 
 from dify_plugin import ToolProvider
 from dify_plugin.errors.tool import ToolProviderCredentialValidationError
-from tools.list_databases import ListDatabasesTool  # 复用底层连接逻辑来验库也行
 from tools.sql_execute import SQLExecuteTool  # 如果你想用更通用的，可以单独写一个
 
 class VexDBProvider(ToolProvider):

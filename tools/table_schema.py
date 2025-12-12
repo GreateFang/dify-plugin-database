@@ -1,9 +1,9 @@
-from dify_plugin import ToolProvider
+from dify_plugin import Tool
 import psycopg2
 import psycopg2.extras
 
 
-class TableSchema(ToolProvider):
+class TableSchema(Tool):
     """
     Fetch table schema: columns + data types + indexes.
     """

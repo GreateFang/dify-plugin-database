@@ -4,41 +4,123 @@ identity:
   label:
     en_US: Vector Search
     zh_Hans: 向量检索
-  description:
-    en_US: Perform similarity search on a floatvector column with configurable distance and topK.
+description:
+  human:
+    en_US: Perform similarity search on a float vector column with configurable distance type and topK.
     zh_Hans: 在 floatvector 字段上执行相似度检索，可配置距离类型和返回数量。
-  icon: icon.svg
+  llm: Perform similarity search on a floatvector column with configurable distance type and topK.
+icon: icon.svg
 
 type: action
+
 parameters:
   - name: table
     type: string
     required: true
+    label:
+      en_US: Table
+      zh_Hans: 表名
+    human_description:
+      en_US: The name of the table to perform vector search on.
+      zh_Hans: 执行向量检索的目标表名。
+    llm_description: The name of the table to perform vector search on.
+    form: llm
+
   - name: vector_column
     type: string
     required: true
+    label:
+      en_US: Vector Column
+      zh_Hans: 向量字段
+    human_description:
+      en_US: The float vector column used for similarity search.
+      zh_Hans: 用于向量相似度检索的 floatvector 字段名称。
+    llm_description: The float vector column used for similarity search.
+    form: llm
+
   - name: query_vector
-    type: array
+    type: string
     required: true
+    label:
+      en_US: Query Vector
+      zh_Hans: 查询向量
+    human_description:
+      en_US: The input vector used to perform similarity search.
+      zh_Hans: 用于执行相似度检索的输入向量。
+    llm_description: The input vector used to perform similarity search.
+    form: llm
+
   - name: distance_type
     type: string
     required: false
+    label:
+      en_US: Distance Type
+      zh_Hans: 距离类型
+    human_description:
+      en_US: Optional. Specify the distance type such as L2, cosine, or inner product.
+      zh_Hans: 选填。指定距离类型，例如 L2、cosine 或 inner product。
+    llm_description: Specify the distance type such as L2, cosine, or inner product.
+    form: llm
+
   - name: top_k
     type: number
     required: false
+    label:
+      en_US: Top K
+      zh_Hans: 返回数量
+    human_description:
+      en_US: Optional. Number of rows to return from the similarity search.
+      zh_Hans: 选填。相似度检索返回的行数。
+    llm_description: Number of rows to return from the similarity search.
+    form: llm
+
   - name: output_columns
     type: string
     required: false
+    label:
+      en_US: Output Columns
+      zh_Hans: 输出字段
+    human_description:
+      en_US: Optional. Specify which columns to include in result. Multiple columns separated by comma.
+      zh_Hans: 选填。指定返回结果中包含哪些字段，多字段用半角逗号分隔。
+    llm_description: Specify which columns to include in result. Multiple columns separated by comma.
+    form: llm
+
   - name: filter
     type: string
     required: false
+    label:
+      en_US: Filter
+      zh_Hans: 过滤条件
+    human_description:
+      en_US: Optional. SQL filter condition to apply before the vector search.
+      zh_Hans: 选填。向量检索前应用的 SQL 过滤条件。
+    llm_description: SQL filter condition to apply before the vector search.
+    form: llm
+
   - name: schema
     type: string
     required: false
-  - name: db_uri
-    type: string
-    required: false
+    label:
+      en_US: Schema
+      zh_Hans: Schema 名称
+    human_description:
+      en_US: Schema name. If not specified, the default database schema is used.
+      zh_Hans: Schema 名称，不填时使用数据库的默认 schema。
+    llm_description: Schema name.
     form: form
+
+  - name: db_uri
+    type: secret-input
+    required: false
+    label:
+      en_US: DB URI
+      zh_Hans: 数据库连接
+    human_description:
+      en_US: Optional. Filling in this field will overwrite the database connection entered during authorization.
+      zh_Hans: 选填。填写后将覆盖授权时填写的数据库连接。
+    llm_description: Database URI to override authorization settings.
+    form: llm
 
 extra:
   python:

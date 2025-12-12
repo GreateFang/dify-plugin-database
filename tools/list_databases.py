@@ -1,7 +1,7 @@
-from dify_plugin import ToolProvider
+from dify_plugin import Tool
 import psycopg2
 
-class ListDatabases(ToolProvider):
+class ListDatabases(Tool):
     """
     List all databases in VexDB (Postgres-compatible).
     """

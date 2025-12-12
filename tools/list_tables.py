@@ -1,9 +1,9 @@
-from dify_plugin import ToolProvider
+from dify_plugin import Tool
 import psycopg2
 import psycopg2.extras
 
 
-class ListTables(ToolProvider):
+class ListTables(Tool):
     """
     List all tables in a schema, optionally filtering only those with vector columns.
     """

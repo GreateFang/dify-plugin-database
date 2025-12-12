@@ -1,10 +1,10 @@
-from dify_plugin import ToolProvider
+from dify_plugin import Tool
 import psycopg2
 import psycopg2.extras
 import json
 
 
-class InsertRow(ToolProvider):
+class InsertRow(Tool):
     """
     Insert a single row into a table.
     Supports all standard VexDB types including floatvector.

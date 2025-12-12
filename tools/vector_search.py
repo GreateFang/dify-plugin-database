@@ -1,10 +1,10 @@
-from dify_plugin import ToolProvider
+from dify_plugin import Tool
 import psycopg2
 import psycopg2.extras
 import json
 
 
-class VectorSearch(ToolProvider):
+class VectorSearch(Tool):
     """
     Perform vector similarity search on a floatvector column.
     """
