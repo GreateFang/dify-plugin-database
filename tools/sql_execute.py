@@ -1,82 +1,49 @@
-from collections.abc import Generator
-from typing import Any
-import re
-import json
-
-import records
-from sqlalchemy import text
+from typing import Dict, Any, Generator
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
-from tools.db_utils import fix_db_uri_encoding
-
+import psycopg2
+import psycopg2.extras
+import json
 
 class SQLExecuteTool(Tool):
-    def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
+    def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage, None, None]:
         db_uri = tool_parameters.get("db_uri") or self.runtime.credentials.get("db_uri")
         if not db_uri:
-            raise ValueError("Database URI is not provided.")
+            yield self.create_text_message("Error: Database URI is not provided.")
+            return
         
-        # 修复 db_uri 中的特殊字符编码问题
-        db_uri = fix_db_uri_encoding(db_uri)
-        
-        query = tool_parameters.get("query").strip()
-        format = tool_parameters.get("format", "json")
-        config_options = tool_parameters.get("config_options") or "{}"
-        try:
-            config_options = json.loads(config_options)
-        except json.JSONDecodeError:
-            raise ValueError("Invalid JSON format for Connect Config")
-        db = records.Database(db_uri, **config_options)
+        query = tool_parameters.get("query", "").strip()
+        if not query:
+            yield self.create_text_message("Error: Query is empty.")
+            return
 
+        conn = None
         try:
-            if re.match(r'^\s*(SELECT|WITH)\s+', query, re.IGNORECASE):
-                rows = db.query(query)
-                if format == "json":
-                    result = rows.as_dict()
-                    yield self.create_json_message({"result": result})
-                elif format == "md":
-                    result = str(rows.dataset)
-                    yield self.create_text_message(result)
-                elif format == "csv":
-                    result = rows.export("csv").encode()
-                    yield self.create_blob_message(
-                        result, meta={"mime_type": "text/csv", "filename": "result.csv"}
-                    )
-                elif format == "yaml":
-                    result = rows.export("yaml").encode()
-                    yield self.create_blob_message(
-                        result,
-                        meta={"mime_type": "text/yaml", "filename": "result.yaml"},
-                    )
-                elif format == "xlsx":
-                    result = rows.export("xlsx")
-                    yield self.create_blob_message(
-                        result,
-                        meta={
-                            "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            "filename": "result.xlsx",
-                        },
-                    )
-                elif format == "html":
-                    result = rows.export("html").encode()
-                    yield self.create_blob_message(
-                        result,
-                        meta={"mime_type": "text/html", "filename": "result.html"},
-                    )
-                else:
-                    raise ValueError(f"Unsupported format: {format}")
+            conn = psycopg2.connect(db_uri)
+            # 自动提交模式，或者手动管理事务
+            conn.autocommit = True 
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            is_select = query.strip().upper().startswith(("SELECT", "WITH", "EXPLAIN"))
+
+            cur.execute(query)
+            
+            if is_select:
+                rows = cur.fetchall()
+                # ✅ 修复：返回 JSON 格式
+                yield self.create_json_message({
+                    "result": rows,
+                    "count": len(rows)
+                })
             else:
-                with db.get_connection() as conn:
-                    trans = conn._conn.begin()
-                    try:
-                        result = conn._conn.execute(text(query))
-                        affected_rows = result.rowcount
-                        trans.commit()
-                        yield self.create_text_message(
-                            f"Query executed successfully. Affected rows: {affected_rows}"
-                        )
-                    except Exception as e:
-                        trans.rollback()
-                        yield self.create_text_message(f"Error: {str(e)}")
+                # 非查询语句（UPDATE/INSERT/DELETE）
+                affected = cur.rowcount
+                yield self.create_text_message(f"Query executed successfully. Affected rows: {affected}")
+
+            cur.close()
+
+        except Exception as e:
+            yield self.create_text_message(f"SQL Execution Error: {str(e)}")
         finally:
-            db.close()
+            if conn:
+                conn.close()

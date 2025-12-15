@@ -1,0 +1,32 @@
+identity:
+  name: list_databases
+  author: shuzhiyinhang
+  label:
+    en_US: List Databases
+    zh_Hans: 列出所有数据库
+  icon: icon.svg
+
+description:
+  human:
+    en_US: List all non-template databases in the VexDB instance.
+    zh_Hans: 列出当前 VexDB 实例中的所有非模板数据库。
+  llm: List all non-template databases in the VexDB instance.
+
+type: action
+
+parameters:
+  - name: db_uri
+    type: secret-input
+    required: false
+    form: llm
+    label:
+      en_US: VexDB URI
+      zh_Hans: VexDB URI
+    human_description:
+      en_US: Optional. Filling in this field will overwrite the database connection entered during authorization.
+      zh_Hans: 可选，填写后将覆盖授权时填写的数据库连接。
+    llm_description: Optional. Filling in this field will overwrite the database connection entered during authorization.
+
+extra:
+  python:
+    source: tools/list_databases.py

@@ -1,92 +1,89 @@
-from collections.abc import Generator
-from typing import Any
-import json
-
-from sqlalchemy import create_engine, inspect
+from typing import Dict, Any, Generator
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
-from tools.db_utils import fix_db_uri_encoding
+import psycopg2
+import psycopg2.extras
 
+class TableSchema(Tool):
+    """
+    Fetch table schema: columns + data types + indexes.
+    """
 
-class QueryTool(Tool):
-    def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
-        db_uri = tool_parameters.get("db_uri") or self.runtime.credentials.get("db_uri")
+    def _invoke(self, params: dict, **kwargs) -> Generator[ToolInvokeMessage, None, None]:
+        # 1. 自动获取凭证：如果 params 里没有，尝试从环境凭证获取
+        db_uri = params.get("db_uri") or self.runtime.credentials.get("db_uri")
+        schema = params.get("schema", "public")
+        tables = params.get("tables")
+
+        # 2. 错误处理：不要 raise Exception，而是返回错误信息给 LLM
         if not db_uri:
-            raise ValueError("Database URI is not provided.")
-        
-        # 修复 db_uri 中的特殊字符编码问题
-        db_uri = fix_db_uri_encoding(db_uri)
-        
-        config_options = tool_parameters.get("config_options") or "{}"
+            yield self.create_text_message("Error: db_uri is required.")
+            return
+
+        # 多表处理
+        if tables:
+            table_list = [t.strip() for t in tables.split(",")]
+        else:
+            table_list = None
+
+        conn = None
         try:
-            config_options = json.loads(config_options)
-        except json.JSONDecodeError:
-            raise ValueError("Invalid JSON format for Connect Config")
-        engine = create_engine(db_uri, **config_options)
-        inspector = inspect(engine)
+            conn = psycopg2.connect(db_uri)
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        tables = tool_parameters.get("tables")
-        schema = tool_parameters.get("schema")
-        if not schema:
-            # sometimes the schema is empty string, it must be None
-            schema = None
-        tables = tables.split(",") if tables else inspector.get_table_names(schema=schema)
+            # 若未指定 tables，则列出 schema 下所有表
+            if not table_list:
+                cur.execute(
+                    "SELECT tablename FROM pg_tables WHERE schemaname = %s;",
+                    (schema,)
+                )
+                table_list = [r["tablename"] for r in cur.fetchall()]
 
-        schema_info = {}
-        with engine.connect() as _:
-            for table_name in tables:
-                # Basic table info
-                table_info = {
-                    "table_name": table_name,
-                    "columns": [],
-                    "primary_keys": inspector.get_pk_constraint(table_name, schema=schema).get('constrained_columns', []),
-                    "foreign_keys": [],
-                    "indexes": []
-                }
-                
-                # Get table comment
+            result = {}
+
+            for tb in table_list:
+                full_table = f"{schema}.{tb}"
+
+                # 获取字段信息
+                # 使用 try-except 防止因为单张表权限问题导致整体失败
                 try:
-                    table_info["comment"] = inspector.get_table_comment(table_name, schema=schema).get('text', '')
-                except NotImplementedError:
-                    table_info["comment"] = ""
-                
-                # Get foreign keys
-                try:
-                    for fk in inspector.get_foreign_keys(table_name, schema=schema):
-                        table_info["foreign_keys"].append({
-                            "referred_table": fk['referred_table'],
-                            "referred_columns": fk['referred_columns'],
-                            "constrained_columns": fk['constrained_columns']
-                        })
-                except NotImplementedError:
-                    pass
-                
-                # Get indexes
-                try:
-                    for idx in inspector.get_indexes(table_name, schema=schema):
-                        table_info["indexes"].append({
-                            "name": idx['name'],
-                            "columns": idx['column_names'],
-                            "unique": idx['unique']
-                        })
-                except NotImplementedError:
-                    pass
-                
-                # Get columns
-                try:
-                    columns = inspector.get_columns(table_name, schema=schema)
-                    table_info["columns"] = [
-                        {
-                            "name": col["name"],
-                            "type": str(col["type"]),
-                            "nullable": col.get("nullable", True),
-                            "default": col.get("default"),
-                            "comment": col.get("comment", ""),
-                        }
-                        for col in columns
-                    ]
-                    
-                    schema_info[table_name] = table_info
+                    cur.execute("""
+                        SELECT attname AS column,
+                               atttypid::regtype::text AS type
+                        FROM pg_attribute
+                        WHERE attrelid = %s::regclass
+                          AND attnum > 0
+                          AND NOT attisdropped;
+                    """, (full_table,))
+                    columns = cur.fetchall()
+
+                    # 获取索引信息
+                    cur.execute("""
+                        SELECT indexname, indexdef
+                        FROM pg_indexes
+                        WHERE schemaname = %s AND tablename = %s;
+                    """, (schema, tb))
+                    indexes = cur.fetchall()
+
+                    result[tb] = {
+                        "columns": columns,
+                        "indexes": indexes
+                    }
                 except Exception as e:
-                    schema_info[table_name] = f"Error getting schema: {str(e)}"
-        yield self.create_text_message(json.dumps(schema_info, ensure_ascii=False))
+                    # 记录错误但不中断循环
+                    result[tb] = {"error": str(e)}
+
+            cur.close()
+            
+            # ✅ 修复核心：
+            # 1. 使用 create_json_message 包装结果
+            # 2. 使用 yield 而不是 return
+            yield self.create_json_message(result)
+
+        except Exception as e:
+            # 捕获连接级错误
+            yield self.create_text_message(f"Schema fetch error: {str(e)}")
+            
+        finally:
+            if conn:
+                conn.close()

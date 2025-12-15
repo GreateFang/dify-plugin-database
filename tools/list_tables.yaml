@@ -1,0 +1,53 @@
+identity:
+  name: list_tables
+  author: shuzhiyinhang
+  label:
+    en_US: List Tables
+    zh_Hans: 列出数据库下的所有表
+
+description:
+  human:
+    en_US: List all tables in the specified schema, with an option to return only tables that contain vector fields.
+    zh_Hans: 列出指定 schema 下的所有表，并可选只返回包含向量字段的表。
+  llm: List all tables in the specified schema, optionally filtering by vector columns.
+
+parameters:
+  - name: schema
+    type: string
+    required: false
+    label:
+      en_US: Schema
+      zh_Hans: Schema 名称
+    human_description:
+      en_US: Optional. Defaults to 'public' if not specified.
+      zh_Hans: 可选。不填默认为 public。
+    llm_description: Schema name to list tables from. Defaults to 'public' if omitted.
+    form: llm
+
+  - name: only_vector_tables
+    type: boolean
+    required: false
+    label:
+      en_US: Only tables with vector columns
+      zh_Hans: 仅包含向量字段的表
+    human_description:
+      en_US: Optional. If true, only tables that contain vector columns will be returned.
+      zh_Hans: 可选。为 true 时，仅返回包含向量字段的表。
+    llm_description: If true, return only tables containing vector columns.
+    form: llm
+
+  - name: db_uri
+    type: secret-input
+    required: false
+    label:
+      en_US: VexDB URI
+      zh_Hans: VexDB URI
+    human_description:
+      en_US: Optional. Filling in this field will overwrite the database connection entered during authorization.
+      zh_Hans: 选填，填写后将覆盖授权时填写的数据库连接。
+    llm_description: Optional database connection string. Overrides provider credentials.
+    form: llm
+
+extra:
+  python:
+    source: tools/list_tables.py

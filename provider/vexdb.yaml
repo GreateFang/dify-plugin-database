@@ -1,20 +1,21 @@
 identity:
-  author: hjlarry
-  name: database
+  author: shuzhiyinhang
+  name: vexdb
   label:
-    en_US: Database
+    en_US: VexDB
   description:
-    en_US: This tool is used to execute SQL in an existing database.
-    zh_Hans: 此工具用于在已存在的数据库中执行 SQL 查询。
+    en_US: Vector database integration tools.
+    zh_Hans: 向量数据库集成工具。
   icon: icon.svg
 tools:
-  - tools/sql_execute.yaml
-  - tools/text2sql.yaml
   - tools/table_schema.yaml
-  - tools/csv_query.yaml
+  - tools/insert_row.yaml
+  - tools/list_databases.yaml
+  - tools/vector_search.yaml
+  - tools/list_tables.yaml
 extra:
   python:
-    source: provider/database.py
+    source: provider/vexdb.py
 credentials_for_provider:
   db_uri:
     help:

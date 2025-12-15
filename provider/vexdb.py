@@ -5,7 +5,7 @@ from dify_plugin.errors.tool import ToolProviderCredentialValidationError
 from tools.sql_execute import SQLExecuteTool
 
 
-class DatabaseProvider(ToolProvider):
+class VexdbProvider(ToolProvider):
     def _validate_credentials(self, credentials: dict[str, Any]) -> None:
         if not credentials.get("db_uri"):
             return

@@ -1,15 +1,15 @@
-version: 0.0.6
+version: 0.0.1
 type: plugin
-author: hjlarry
-name: database
+author: shuzhiyinhang
+name: vexdb
 label:
-  en_US: database
-  ja_JP: database
-  zh_Hans: database
-  pt_BR: database
+  en_US: vexdb
+  ja_JP: vexdb
+  zh_Hans: vexdb
+  pt_BR: vexdb
 description:
-  en_US: This tool is used to execute SQL and text2sql in an existing database.
-  zh_Hans: 此工具可以用来连接现有数据库，并执行SQL语句和自然语言转SQL。
+  en_US: VexDB vector database integration for Dify, including database/table management, data operations, and vector search.
+  zh_Hans: 为 Dify 提供 VexDB 向量数据库集成，包括表管理、数据操作、向量检索。
 icon: icon.svg
 resource:
   memory: 268435456
@@ -23,9 +23,7 @@ resource:
       enabled: true
 plugins:
   tools:
-    - provider/database.yaml
-  endpoints:
-    - provider/endpoint.yaml
+    - provider/vexdb.yaml
 meta:
   version: 0.0.1
   arch:

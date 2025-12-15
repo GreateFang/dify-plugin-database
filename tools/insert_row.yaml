@@ -1,0 +1,74 @@
+identity:
+  name: insert_row
+  author: shuzhiyinhang
+  label:
+    en_US: Insert Row
+    zh_Hans: 插入一行数据
+description:
+  human:
+    en_US: Insert a single row into the specified table, supporting all column types including floatvector.
+    zh_Hans: 向指定表插入一行数据，支持所有字段类型（包含 floatvector）。
+  llm: Insert a single row into the specified table.
+parameters:
+  - name: table
+    type: string
+    required: true
+    label:
+      en_US: Table
+      zh_Hans: 表名
+    human_description:
+      en_US: Name of the table you want to insert into.
+      zh_Hans: 需要插入的目标表名。
+    llm_description: Name of the table to insert into.
+    form: llm
+
+  - name: schema
+    type: string
+    required: false
+    label:
+      en_US: Schema
+      zh_Hans: Schema 名称
+    human_description:
+      en_US: Optional. Specify the schema name. If empty, the database default schema (e.g. public) will be used.
+      zh_Hans: 可选，指定 schema 名称。如果为空，则使用数据库默认 schema（如 PostgreSQL 的 public）。
+    llm_description: Optional schema name. Leave empty to use the default schema.
+    form: llm
+
+  - name: row
+    type: string
+    required: true
+    label:
+      en_US: Row Data
+      zh_Hans: 行数据
+    human_description:
+      en_US: Key-value pairs representing the row to insert. All data types including floatvector are supported.
+      zh_Hans: 插入行的键值对数据，支持包括 floatvector 在内的所有字段类型。
+    llm_description: Key-value data representing the row to insert.
+    form: llm
+
+  - name: vector_columns
+    type: string
+    required: false
+    label:
+      en_US: Vector Columns
+      zh_Hans: 向量字段
+    human_description:
+      en_US: Optional. Specify which columns should be treated as vector types. Use comma to separate multiple columns.
+      zh_Hans: 可选，指定哪些字段为向量类型，多个字段用英文逗号分隔。
+    llm_description: Optional vector column names, separated by comma.
+    form: llm
+
+  - name: db_uri
+    type: secret-input
+    required: false
+    label:
+      en_US: DB URI
+    human_description:
+      en_US: Optional. Filling in this field will overwrite the database connection entered during authorization.
+      zh_Hans: 选填，填写后将覆盖授权时填写的数据库连接。
+    llm_description: Optional database connection URI.
+    form: form
+
+extra:
+  python:
+    source: tools/insert_row.py
