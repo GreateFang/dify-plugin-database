@@ -58,7 +58,7 @@ parameters:
       zh_Hans: 距离类型
     human_description:
       en_US: Optional. Specify the distance type such as L2, cosine, or inner product.
-      zh_Hans: 选填。指定距离类型，例如 L2、cosine 或 inner product。
+      zh_Hans: 选填。指定距离类型，例如 L2、cosine 或 ip。
     llm_description: Specify the distance type such as L2, cosine, or inner product.
     form: llm
 
