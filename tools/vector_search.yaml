@@ -69,8 +69,8 @@ parameters:
       en_US: Top K
       zh_Hans: 返回数量
     human_description:
-      en_US: Optional. Number of rows to return from the similarity search.
-      zh_Hans: 选填。相似度检索返回的行数。
+      en_US: Optional. Number of rows to return from the similarity search. Default is 5.
+      zh_Hans: 选填。相似度检索返回的行数，默认值为 5。
     llm_description: Number of rows to return from the similarity search.
     form: llm
 

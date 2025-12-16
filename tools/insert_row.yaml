@@ -46,18 +46,6 @@ parameters:
     llm_description: Key-value data representing the row to insert.
     form: llm
 
-  - name: vector_columns
-    type: string
-    required: false
-    label:
-      en_US: Vector Columns
-      zh_Hans: 向量字段
-    human_description:
-      en_US: Optional. Specify which columns should be treated as vector types. Use comma to separate multiple columns.
-      zh_Hans: 可选，指定哪些字段为向量类型，多个字段用英文逗号分隔。
-    llm_description: Optional vector column names, separated by comma.
-    form: llm
-
   - name: db_uri
     type: secret-input
     required: false
