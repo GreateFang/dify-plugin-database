@@ -13,6 +13,8 @@ class VectorSearch(Tool):
     def _invoke(self, params: dict, **kwargs) -> Generator[ToolInvokeMessage, None, None]:
         db_uri = params.get("db_uri") or self.runtime.credentials.get("db_uri")
         schema = params.get("schema", "public")
+        if not schema:
+            schema = "public"  # 强制默认为 public        
         table = params.get("table")
         vector_column = params.get("vector_column")
         query_vector = params.get("query_vector")

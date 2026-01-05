@@ -12,7 +12,9 @@ class TableSchema(Tool):
     def _invoke(self, params: dict, **kwargs) -> Generator[ToolInvokeMessage, None, None]:
         # 1. 自动获取凭证：如果 params 里没有，尝试从环境凭证获取
         db_uri = params.get("db_uri") or self.runtime.credentials.get("db_uri")
-        schema = params.get("schema", "public")
+        schema = params.get("schema")
+        if not schema:
+            schema = "public"  # 强制默认为 public
         tables = params.get("tables")
 
         # 2. 错误处理：不要 raise Exception，而是返回错误信息给 LLM
@@ -48,13 +50,13 @@ class TableSchema(Tool):
                 # 使用 try-except 防止因为单张表权限问题导致整体失败
                 try:
                     cur.execute("""
-                        SELECT attname AS column,
-                               atttypid::regtype::text AS type
-                        FROM pg_attribute
-                        WHERE attrelid = %s::regclass
-                          AND attnum > 0
-                          AND NOT attisdropped;
-                    """, (full_table,))
+                            SELECT attname AS column,
+                                   format_type(atttypid, atttypmod) AS type
+                            FROM pg_attribute
+                            WHERE attrelid = %s::regclass
+                              AND attnum > 0
+                              AND NOT attisdropped;
+                        """, (full_table,))
                     columns = cur.fetchall()
 
                     # 获取索引信息

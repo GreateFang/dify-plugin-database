@@ -11,6 +11,7 @@ description:
   en_US: VexDB vector database integration for Dify, including database/table management, data operations, and vector search.
   zh_Hans: 为 Dify 提供 VexDB 向量数据库集成，包括表管理、数据操作、向量检索。
 icon: icon.svg
+privacy: PRIVACY.md
 resource:
   memory: 268435456
   permission:

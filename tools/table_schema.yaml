@@ -34,23 +34,6 @@ parameters:
       zh_Hans: 选填，填写后将覆盖授权时填写的数据库连接。
     form: llm
 
-  - name: config_options
-    type: string
-    required: false
-    form: form
-    label:
-      en_US: DB Config Options
-      zh_Hans: 数据库连接配置选项
-    human_description:
-      en_US: |
-        Optional. For example {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
-        More connection options can be found at:
-        https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
-      zh_Hans: |
-        选填项。例如 {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
-        更多连接选项可参考：
-        https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
-
   - name: schema
     type: string
     required: false

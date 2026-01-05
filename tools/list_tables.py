@@ -12,6 +12,8 @@ class ListTables(Tool):
     def _invoke(self, params: dict, **kwargs) -> Generator[ToolInvokeMessage, None, None]:
         db_uri = params.get("db_uri") or self.runtime.credentials.get("db_uri")
         schema = params.get("schema", "public")
+        if not schema:
+            schema = "public"  # 强制默认为 public
         only_vector = params.get("only_vector_tables", False)
 
         # 1. 错误处理：使用 yield 发送消息，然后 return 结束函数

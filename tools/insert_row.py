@@ -14,6 +14,8 @@ class InsertRow(Tool):
     def _invoke(self, params: dict, **kwargs) -> Generator[ToolInvokeMessage, None, None]:
         db_uri = params.get("db_uri") or self.runtime.credentials.get("db_uri")
         schema = params.get("schema", "public")
+        if not schema:
+            schema = "public"  # 强制默认为 public
         table = params.get("table")
         row_input = params.get("row")  # 获取原始输入
 
